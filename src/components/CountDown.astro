@@ -1,0 +1,77 @@
+---
+// src/components/CountDown.astro
+---
+
+<section id="countdown-container">
+  <h1>
+    <span id="days">00</span>d <span id="hours">00</span>h <span id="minutes"
+      >00</span
+    >m <span id="seconds">00</span>s
+  </h1>
+</section>
+
+<style>
+  #countdown-container {
+    width: 100%;
+    text-align: center;
+    font-family: inherit;
+    color: white;
+    padding: 0.5rem 1rem;
+    font-size: 2rem;
+    line-height: 1.4;
+  }
+
+  #countdown-container h1 {
+    margin: 2rem 0 0;
+    font-weight: normal;
+    text-wrap: balance;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    animation: fadeInUp 1s ease-out forwards;
+    animation-delay: 3s;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(15px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<script is:inline>
+  const updateCountdown = () => {
+    const now = new Date();
+    const target = new Date(now.getFullYear(), 6, 25, 0, 0, 0);
+    if (now > target) {
+      target.setFullYear(target.getFullYear() + 1);
+    }
+
+    const diff = target - now;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+
+    document.getElementById("days").textContent = String(days).padStart(2, "0");
+    document.getElementById("hours").textContent = String(hours).padStart(
+      2,
+      "0",
+    );
+    document.getElementById("minutes").textContent = String(minutes).padStart(
+      2,
+      "0",
+    );
+    document.getElementById("seconds").textContent = String(seconds).padStart(
+      2,
+      "0",
+    );
+  };
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+</script>

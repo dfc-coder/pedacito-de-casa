@@ -1,0 +1,42 @@
+---
+
+---
+
+<section id="video-section">
+  <video
+    id="hero-video"
+    playsinline
+    controls
+    src="https://YOUR_PROJECT_REF.supabase.co/storage/v1/object/public/videos/video.mp4"
+    class="video-box fade-up"></video>
+</section>
+
+<style>
+  
+  .video-box {
+    width: 100%;
+    max-width: 640px;
+    height: auto;
+    max-height: 100%;
+    background-color: black;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  }
+
+  .fade-up {
+    opacity: 0;
+    animation: fadeInUp 1s ease-out forwards;
+    animation-delay: 2.2s;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

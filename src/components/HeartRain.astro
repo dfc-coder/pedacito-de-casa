@@ -1,0 +1,59 @@
+---
+
+---
+
+<div id="hearts-background"></div>
+
+<script is:inline>
+  const createHeart = () => {
+    const heart = document.createElement("div");
+    heart.textContent = "❤️";
+    heart.className = "heart";
+    heart.style.position = "absolute";
+    heart.style.left = `${Math.floor(Math.random() * window.innerWidth)}px`;
+    heart.style.top = `0`;
+    heart.style.transform = `translateY(-${Math.random() * 5}rem)`;
+    heart.style.fontSize = `${1 + Math.random() * 2}rem`;
+    heart.style.opacity = `${0.3 + Math.random() * 0.5}`;
+    heart.style.animationDuration = `${4 + Math.random() * 4}s`;
+    heart.style.animationTimingFunction = "linear";
+    heart.style.animationName = "fall";
+    heart.style.animationFillMode = "forwards";
+    heart.style.animationIterationCount = "1";
+    document.getElementById("hearts-background")?.appendChild(heart);
+    setTimeout(() => heart.remove(), 10000);
+  };
+
+  setInterval(createHeart, 300);
+</script>
+
+<style>
+  #hearts-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: -2;
+    overflow: hidden;
+  }
+
+  .heart {
+    animation-name: fall;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+    animation-iteration-count: 1;
+    color: rgba(255, 0, 128, 0.7);
+    z-index: 0;
+  }
+
+  @keyframes fall {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(120vh);
+    }
+  }
+</style>

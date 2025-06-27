@@ -1,0 +1,90 @@
+---
+
+---
+
+<section id="motivational-marquee">
+  <div class="marquee">
+    <div class="marquee__inner" id="marquee-inner">
+      <!-- Quotes will be injected here -->
+    </div>
+  </div>
+</section>
+
+<style>
+  #motivational-marquee {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 0;
+    z-index: 10;
+  }
+
+  .marquee {
+    overflow: hidden;
+    white-space: nowrap;
+    width: 100%;
+  }
+
+  .marquee__inner {
+    display: inline-flex;
+    white-space: nowrap;
+    animation: marquee 15s linear infinite;
+  }
+
+  .marquee__inner .marquee-quote {
+    opacity: 0;
+    padding-right: 2rem;
+    font-size: 2rem;
+    color: black;
+  }
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+</style>
+
+<script is:inline>
+  const quotes = [
+    "La vida es un regalo, disfrútala con el corazón abierto.",
+    "Haz de cada día una pequeña obra de arte.",
+    "La sonrisa es el idioma universal del alma.",
+    "Incluso la noche más oscura terminará con la salida del sol.",
+    "Sé tú el cambio que quieres ver en el mundo.",
+    "Nunca es tarde para comenzar de nuevo con más sabiduría.",
+  ];
+
+  const quote = quotes[Math.floor(Math.random() * quotes.length)] + "";
+  const marqueeInner = document.getElementById("marquee-inner");
+
+  if (marqueeInner) {
+    for (let i = 0; i < 2; i++) {
+      const span = document.createElement("span");
+      span.classList.add("marquee-quote");
+      span.textContent = quote;
+      span.style.paddingRight = "2rem";
+      span.style.fontSize = "2rem";
+      span.style.color = "black";
+      span.style.whiteSpace = "nowrap";
+      marqueeInner.appendChild(span);
+    }
+  }
+</script>
