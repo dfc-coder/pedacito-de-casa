@@ -1,34 +1,130 @@
 ---
+// VideoBox.astro
+import { supabase } from "../db/supabase";
 
+interface Props {
+  bucket: string;
+  folder?: string;
+  limit?: number;
+}
+
+const { bucket = "videos", folder = "", limit = 10 } = Astro.props;
+
+const { data: files, error } = await supabase.storage
+  .from(bucket)
+  .list(folder, {
+    limit,
+    sortBy: { column: "name", order: "asc" },
+  });
+
+let videos: string[] = [];
+
+if (!error && files && files.length > 0) {
+  for (const file of files) {
+    if (file.name.toLowerCase().endsWith(".mp4")) {
+      const path = folder ? `${folder}/${file.name}` : file.name;
+      const { publicUrl } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(path).data;
+      if (publicUrl) videos.push(publicUrl);
+    }
+  }
+}
 ---
 
-<section id="video-section">
-  <video
-    id="hero-video"
-    playsinline
-    controls
-    src="https://YOUR_PROJECT_REF.supabase.co/storage/v1/object/public/videos/video.mp4"
-    class="video-box fade-up"></video>
-</section>
+{
+  videos.length === 0 ? (
+    <p>No se pudieron cargar los videos.</p>
+  ) : (
+    <section class="carousel-container fade-in-up">
+      <div class="carousel">
+        {videos.map((url) => (
+          <div class="carousel-item">
+            <video
+              preload="none"
+              playsinline
+              muted
+              controls
+              class="carousel-video lazy-video"
+              data-src={url}
+            />
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    const lazyVideos = document.querySelectorAll(".lazy-video");
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const video = entry.target;
+
+          if (entry.isIntersecting) {
+            if (!video.src) {
+              video.src = video.dataset.src;
+            }
+
+            // Reproducir automáticamente si está en viewport
+            video.play().catch(() => {}); // Evita errores si el usuario no ha interactuado
+          } else {
+            // Pausar el video si sale del viewport
+            video.pause();
+          }
+        });
+      },
+      { threshold: 0.6 },
+    );
+
+    lazyVideos.forEach((video) => observer.observe(video));
+  });
+</script>
 
 <style>
-  
-  .video-box {
-    width: 100%;
-    max-width: 640px;
-    height: auto;
-    max-height: 100%;
-    background-color: black;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-  }
-
-  .fade-up {
-    opacity: 0;
+  .carousel-container {
+    width: 100vw;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 1rem 0;
     animation: fadeInUp 1s ease-out forwards;
-    animation-delay: 2.2s;
   }
 
+  .carousel-container::-webkit-scrollbar {
+    display: none;
+  }
+  .carousel-container {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .carousel {
+    display: flex;
+  }
+
+  .carousel-item {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+  }
+
+  .carousel-video {
+    width: 100%;
+    height: auto;
+    max-height: 80vh;
+    border-radius: 12px;
+    background: black;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Animación de entrada */
   @keyframes fadeInUp {
     from {
       opacity: 0;
@@ -38,5 +134,11 @@
       opacity: 1;
       transform: translateY(0);
     }
+  }
+
+  .fade-in-up {
+    opacity: 0;
+    animation: fadeInUp 1s ease-out forwards;
+    animation-delay: 0.2s;
   }
 </style>
