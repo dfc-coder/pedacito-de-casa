@@ -40,7 +40,7 @@
     opacity: 0;
     padding-right: 2rem;
     font-size: 2rem;
-    color: black;
+    color: rgb(61, 160, 173);
   }
 
   @keyframes marquee {
@@ -63,16 +63,7 @@
 </style>
 
 <script is:inline>
-  const quotes = [
-    "La vida es un regalo, disfrútala con el corazón abierto.",
-    "Haz de cada día una pequeña obra de arte.",
-    "La sonrisa es el idioma universal del alma.",
-    "Incluso la noche más oscura terminará con la salida del sol.",
-    "Sé tú el cambio que quieres ver en el mundo.",
-    "Nunca es tarde para comenzar de nuevo con más sabiduría.",
-  ];
-
-  const quote = quotes[Math.floor(Math.random() * quotes.length)] + "";
+  const quote = "nunca olvides que mis días sin ti no tienen sentido, te extraño mucho";
   const marqueeInner = document.getElementById("marquee-inner");
 
   if (marqueeInner) {
@@ -81,7 +72,7 @@
       span.classList.add("marquee-quote");
       span.textContent = quote;
       span.style.paddingRight = "2rem";
-      span.style.fontSize = "2rem";
+      span.style.fontSize = "2rem"; // igual que antes
       span.style.color = "black";
       span.style.whiteSpace = "nowrap";
       marqueeInner.appendChild(span);

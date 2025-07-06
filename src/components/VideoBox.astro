@@ -7,7 +7,7 @@ interface Props {
   limit?: number;
 }
 
-const { bucket = "videos", folder = "", limit = 10 } = Astro.props;
+const { bucket = "videos", folder = "", limit = 30 } = Astro.props;
 
 // Función de shuffle eficiente (Fisher–Yates)
 function shuffle<T>(array: T[]): T[] {
@@ -47,6 +47,9 @@ if (!error && files && files.length > 0) {
   <p>No se pudieron cargar los videos.</p>
 ) : (
   <section class="carousel-container fade-in-up">
+    {videos.length > 1 && (
+      <div class="swipe-indicator">⇠ desliza ⇢</div>
+    )}
     <div class="carousel">
       {videos.map((url) => (
         <div class="carousel-item">
@@ -92,6 +95,7 @@ if (!error && files && files.length > 0) {
 
 <style>
   .carousel-container {
+    position: relative; /* Necesario para posicionar el indicador */
     width: 100%;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
@@ -162,5 +166,40 @@ if (!error && files && files.length > 0) {
     opacity: 0;
     animation: fadeInUp 1s ease-out forwards;
     animation-delay: 0.2s;
+  }
+
+  /* Indicador minimalista */
+  .swipe-indicator {
+    position: absolute;
+    top: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.5rem;
+    color: white;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    opacity: 0;
+    animation: swipeFade 4s ease-out forwards;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  @keyframes swipeFade {
+    0% {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-10px);
+    }
+    10% {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-10px);
+    }
   }
 </style>
