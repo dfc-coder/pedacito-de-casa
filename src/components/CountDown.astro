@@ -3,32 +3,50 @@
 ---
 
 <section id="countdown-container">
-  <h1>
-    <span id="days">00</span>d <span id="hours">00</span>h <span id="minutes"
-      >00</span
-    >m <span id="seconds">00</span>s
-  </h1>
+  <h2>nos vemos en</h2>
+  <div class="countdown">
+    <span id="days">00</span> :
+    <span id="hours">00</span> :
+    <span id="minutes">00</span> :
+    <span id="seconds">00</span>
+  </div>
 </section>
 
 <style>
   #countdown-container {
     width: 100%;
     text-align: center;
-    font-family: inherit;
-    color: white;
-    padding: 0.5rem 1rem;
-    font-size: 2rem;
-    line-height: 1.4;
+    font-family: monospace;
+    color: rgb(0, 0, 0);
+    padding: 1rem;
   }
 
-  #countdown-container h1 {
-    margin: 2rem 0 0;
-    font-weight: normal;
-    text-wrap: balance;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  #countdown-container h2 {
+    font-size: 2rem;
+    margin: 0 0 0.5rem;
+    text-transform: uppercase;
     opacity: 0;
     animation: fadeInUp 1s ease-out forwards;
-    animation-delay: 3s;
+    animation-delay: 1.5s;
+  }
+
+  .countdown {
+    display: inline-flex;
+    justify-content: center;
+    gap: 0.25rem;
+    font-size: 2rem;
+    letter-spacing: 0.1rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.4rem;
+    opacity: 0;
+    animation: fadeInUp 1s ease-out forwards;
+    animation-delay: 2s;
+  }
+
+  .countdown span {
+    min-width: 2ch;
+    display: inline-block;
+    text-align: center;
   }
 
   @keyframes fadeInUp {
@@ -58,18 +76,9 @@
     const seconds = Math.floor((diff / 1000) % 60);
 
     document.getElementById("days").textContent = String(days).padStart(2, "0");
-    document.getElementById("hours").textContent = String(hours).padStart(
-      2,
-      "0",
-    );
-    document.getElementById("minutes").textContent = String(minutes).padStart(
-      2,
-      "0",
-    );
-    document.getElementById("seconds").textContent = String(seconds).padStart(
-      2,
-      "0",
-    );
+    document.getElementById("hours").textContent = String(hours).padStart(2, "0");
+    document.getElementById("minutes").textContent = String(minutes).padStart(2, "0");
+    document.getElementById("seconds").textContent = String(seconds).padStart(2, "0");
   };
 
   updateCountdown();

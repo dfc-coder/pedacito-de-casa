@@ -1,32 +1,154 @@
 ---
+import { supabase } from "../db/supabase";
 
----
+interface Props {
+  bucket: string;
+  folder?: string;
+  limit?: number;
+}
 
-<section id="video-section">
-  <video
-    id="hero-video"
-    playsinline
-    controls
-    src="https://YOUR_PROJECT_REF.supabase.co/storage/v1/object/public/videos/video.mp4"
-    class="video-box fade-up"></video>
-</section>
+const { bucket = "videos", folder = "", limit = 30 } = Astro.props;
 
-<style>
-  
-  .video-box {
-    width: 100%;
-    max-width: 640px;
-    height: auto;
-    max-height: 100%;
-    background-color: black;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+// Función de shuffle eficiente (Fisher–Yates)
+function shuffle<T>(array: T[]): T[] {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// Obtener videos desde Supabase
+const { data: files, error } = await supabase.storage
+  .from(bucket)
+  .list(folder, {
+    limit,
+    sortBy: { column: "name", order: "asc" },
+  });
+
+let videos: string[] = [];
+
+if (!error && files && files.length > 0) {
+  for (const file of files) {
+    if (file.name.toLowerCase().endsWith(".mp4")) {
+      const path = folder ? `${folder}/${file.name}` : file.name;
+      const { publicUrl } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(path).data;
+      if (publicUrl) videos.push(publicUrl);
+    }
   }
 
-  .fade-up {
-    opacity: 0;
+  videos = shuffle(videos); // Aleatorizar el orden de los videos
+}
+---
+
+{videos.length === 0 ? (
+  <p>No se pudieron cargar los videos.</p>
+) : (
+  <section class="carousel-container fade-in-up">
+    {videos.length > 1 && (
+      <div class="swipe-indicator">⇠ desliza ⇢</div>
+    )}
+    <div class="carousel">
+      {videos.map((url) => (
+        <div class="carousel-item">
+          <video
+            preload="none"
+            playsinline
+            muted
+            controls
+            class="carousel-video lazy-video"
+            data-src={url}
+          />
+        </div>
+      ))}
+    </div>
+  </section>
+)}
+
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    const lazyVideos = document.querySelectorAll(".lazy-video");
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const video = entry.target;
+
+          if (entry.isIntersecting) {
+            if (!video.src) {
+              video.src = video.dataset.src;
+            }
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+        });
+      },
+      { threshold: 0.6 },
+    );
+
+    lazyVideos.forEach((video) => observer.observe(video));
+  });
+</script>
+
+<style>
+  .carousel-container {
+    position: relative; /* Necesario para posicionar el indicador */
+    width: 100%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 1rem 0;
+    display: flex;
     animation: fadeInUp 1s ease-out forwards;
-    animation-delay: 2.2s;
+  }
+
+  .carousel-container::-webkit-scrollbar {
+    display: none;
+  }
+  .carousel-container {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .carousel {
+    display: flex;
+    gap: 1rem;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    width: 100%;
+  }
+
+  .carousel-item {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease;
+    padding: 0 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .carousel-item {
+      flex: 0 0 80%;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .carousel-item {
+      flex: 0 0 60%;
+    }
+  }
+
+  .carousel-video {
+    width: 100%;
+    max-height: 75vh;
+    border-radius: 16px;
+    background-color: black;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   }
 
   @keyframes fadeInUp {
@@ -37,6 +159,47 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  .fade-in-up {
+    opacity: 0;
+    animation: fadeInUp 1s ease-out forwards;
+    animation-delay: 0.2s;
+  }
+
+  /* Indicador minimalista */
+  .swipe-indicator {
+    position: absolute;
+    top: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.5rem;
+    color: white;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    opacity: 0;
+    animation: swipeFade 4s ease-out forwards;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  @keyframes swipeFade {
+    0% {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-10px);
+    }
+    10% {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-10px);
     }
   }
 </style>
